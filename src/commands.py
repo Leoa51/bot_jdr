@@ -11,6 +11,10 @@ HP_FILE = "hp_data.json"
 
 
 
+async def json(config, ctx):
+    await config.load_config_from_channel(ctx)
+    await ctx.send(config.Characters.keys())
+
 
 
 # Chargement des données depuis un fichier JSON

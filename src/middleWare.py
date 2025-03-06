@@ -29,6 +29,13 @@ class middleWare:
 
         @bot.command()
         @check_rights_wrapper
+        async def json(ctx):
+            print("command json")
+            await commands.json(self.config, ctx)
+
+
+        @bot.command()
+        @check_rights_wrapper
         async def roll(ctx, dice: str = "1d100"):
             print("command roll")
             # await commands.check_rights(ctx)

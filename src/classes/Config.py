@@ -1,5 +1,10 @@
 import json
 
+import discord
+from discord import client
+
+from src.classes.Character import Character
+
 
 class Config:
 
@@ -16,6 +21,28 @@ class Config:
             with open("config.json", "r") as f:
                 self.Characters = json.load(f)
         except Exception:
+            self.Characters = {}
+
+    async def load_config_from_channel(self, ctx):
+        try:
+            # with open("config.json", "r") as f:
+            # channel = discord.utils.get(client.get_all_channels(), name="json")
+            channel = discord.utils.get(ctx.guild.text_channels, name="json")
+            # print(ctx.guild.text_channels)
+
+            # for message in channel.history(limit=100):
+            async for message in channel.history(limit=100):
+                if message.content.startswith("json"):
+                    Characters_buffer = json.loads(message.content[4:].strip())
+                    self.Characters = {k: Character(v["name"], v["hp"]) for k, v in Characters_buffer.items()}
+                    self.write_config()
+                    await ctx.send("Configuration chargée.")
+                    break
+                else:
+                    await ctx.send("Aucune configuration trouvée.")
+                # self.Characters = json.load(f)
+        except Exception:
+            await ctx.send("Aucune configuration trouvée.")
             self.Characters = {}
 
     def write_config(self):
