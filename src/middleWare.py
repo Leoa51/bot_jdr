@@ -1,20 +1,43 @@
 # import commands
 # from . import commands
+from functools import wraps
+
 from src import commands
+# from src.commands import check_rights_wrapper
+
+def check_rights_wrapper(func):
+    @wraps(func)
+    async def wrapper(ctx, *args, **kwargs):
+        if ctx.author.guild_permissions.administrator:
+            # await ctx.send("Vous avez les droits nécessaires.")
+            return await func(ctx, *args, **kwargs)
+        else:
+            await ctx.send("Vous n'avez pas les droits nécessaires.")
+            return
+    return wrapper
 
 
 class middleWare:
-    def __init__(self, bot):
+    def __init__(self, bot, config):
         self.bot = bot
+        self.config = config
 
         @bot.event
         async def on_ready():
             print(f'Connecté en tant que {self.bot.user}')
 
+
         @bot.command()
-        async def roll(ctx, faces: int = 6):
+        @check_rights_wrapper
+        async def roll(ctx, dice: str = "1d100"):
             print("command roll")
-            await commands.roll(ctx, faces)
+            # await commands.check_rights(ctx)
+            await commands.roll(ctx, dice)
+
+        @bot.command()
+        async def create_character(ctx, name: str, hp: int):
+            print("command create_character")
+            await commands.create_character(self.config, ctx, name, hp)
 
 
         @bot.command()
