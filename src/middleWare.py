@@ -33,6 +33,12 @@ class middleWare:
             print("command json")
             await commands.json(self.config, ctx)
 
+        @bot.command()
+        @check_rights_wrapper
+        async def write_json(ctx):
+            print("command write_config_on_channel")
+            await config.write_config_on_channel(ctx)
+
 
         @bot.command()
         @check_rights_wrapper
@@ -45,6 +51,8 @@ class middleWare:
         async def create_character(ctx, name: str, hp: int):
             print("command create_character")
             await commands.create_character(self.config, ctx, name, hp)
+
+
 
 
         @bot.command()
@@ -65,7 +73,7 @@ class middleWare:
         @bot.command()
         async def dommage(ctx, name: str, amount: int):
             print("command dommage")
-            await commands.dommage(ctx, name, amount)
+            await commands.dommage(self.config, ctx, name, amount)
 
         # @bot.command()
         # async def help(ctx):

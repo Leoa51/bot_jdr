@@ -19,7 +19,8 @@ class Config:
     def load_config(self):
         try:
             with open("config.json", "r") as f:
-                self.Characters = json.load(f)
+                Characters_buffer = json.load(f)
+                self.Characters = {k: Character(v["name"], v["hp"], v["current_hp"]) for k, v in Characters_buffer.items()}
         except Exception:
             self.Characters = {}
 
@@ -34,7 +35,7 @@ class Config:
             async for message in channel.history(limit=100):
                 if message.content.startswith("json"):
                     Characters_buffer = json.loads(message.content[4:].strip())
-                    self.Characters = {k: Character(v["name"], v["hp"]) for k, v in Characters_buffer.items()}
+                    self.Characters = {k: Character(v["name"], v["hp"], v["current_hp"]) for k, v in Characters_buffer.items()}
                     self.write_config()
                     await ctx.send("Configuration chargée.")
                     break
@@ -44,6 +45,15 @@ class Config:
         except Exception:
             await ctx.send("Aucune configuration trouvée.")
             self.Characters = {}
+
+    async def write_config_on_channel(self, ctx):
+        try:
+            channel = discord.utils.get(ctx.guild.text_channels, name="json")
+            await channel.send("json " + json.dumps({k: v.to_dict() for k, v in self.Characters.items()}))
+            await ctx.send("Configuration envoyée au channel json.")
+        except Exception as e:
+            await ctx.send(f"Aucun channel json trouvée. {e}")
+
 
     def write_config(self):
         print(self.Characters)
@@ -57,3 +67,11 @@ class Config:
             return int(max(self.Characters.keys()))
         except ValueError:
             return 0
+
+    def get_character_by_id(self, id):
+        return self.Characters[str(id)]
+
+    def get_character_by_name(self, name):
+        for id, character in self.Characters.items():
+            if character.name == name:
+                return character
