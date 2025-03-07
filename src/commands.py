@@ -35,9 +35,18 @@ async def roll(ctx, dice: str = "1d100"):
 
 
 async def dommage(config, ctx, name, amount):
-    config.get_character_by_name(name).take_damage(amount)
-    config.write_config()
-    await ctx.send(f'❤️ {name} a maintenant {config.get_character_by_name(name).current_hp} PV.')
+    character = config.get_character_by_name(name)
+    character.take_damage(amount)
+    # config.write_config()
+    await ctx.send(f'{ "❤️" if character.current_hp > 0 else "☠️"} {name} a maintenant {character.current_hp} PV.')
+
+
+async def heal(config, ctx, name, amount):
+    character = config.get_character_by_name(name)
+    character.heal(amount)
+    # config.write_config()
+
+    await ctx.send(f'❤️ {name} a maintenant {character.current_hp} PV.')
 
 
 async def create_character(config, ctx, name, hp):
@@ -47,6 +56,17 @@ async def create_character(config, ctx, name, hp):
     config.write_config()
     await ctx.send(f'✅ {name} a été créé avec {hp} PV.')
 
+async def delete_character_by_name(config : Config, ctx, name):
+    character_id = config.get_character_id_by_name(name)
+    config.Characters.pop(character_id)
+    config.write_config()
+    await ctx.send(f'✅ {name}, {character_id} a été supprimé.')
+
+
+async def delete_character_by_id(config : Config, ctx, id):
+    config.Characters.pop(id)
+    config.write_config()
+    await ctx.send(f'✅ {id} a été supprimé.')
 
 
 

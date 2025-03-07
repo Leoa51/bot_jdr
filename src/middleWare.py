@@ -26,6 +26,24 @@ class middleWare:
         async def on_ready():
             print(f'Connecté en tant que {self.bot.user}')
 
+        @bot.command()
+        async def exit(ctx):
+            print("command exit")
+            self.last_ctx = ctx
+            await bot.close()
+
+        @bot.event
+        async def on_disconnect():
+            config.write_config()
+            print("Le bot est en train de se déconnecter...")
+            await config.write_config_on_channel(self.last_ctx)
+            # Ajoutez ici le code que vous souhaitez exécuter avant que le bot ne s'arrête
+
+        # @bot.event
+        # async def on_close():
+        #     print("Le bot est en train de fermer la connexion...")
+        #     # Ajoutez ici le code que vous souhaitez exécuter avant que le bot ne s'arrête
+
 
         @bot.command()
         @check_rights_wrapper
@@ -68,18 +86,24 @@ class middleWare:
         @bot.command()
         async def soin(ctx, name: str, amount: int):
             print("command soin")
-            await commands.soin(ctx, name, amount)
+            await commands.heal(self.config, ctx, name, amount)
 
         @bot.command()
         async def dommage(ctx, name: str, amount: int):
             print("command dommage")
             await commands.dommage(self.config, ctx, name, amount)
 
-        # @bot.command()
-        # async def help(ctx):
-        #     print("command help")
-        #     print(commands.Personnage.__subclasses__())
+        @bot.command()
+        @check_rights_wrapper
+        async def delete_character(ctx, name: str):
+            print("command delete_character")
+            await commands.delete_character_by_name(self.config, ctx, name)
 
+        @bot.command()
+        @check_rights_wrapper
+        async def delete_character_by_id(ctx, id: str):
+            print("command delete_character by id")
+            await commands.delete_character_by_id(self.config, ctx, id)
 
 
 
